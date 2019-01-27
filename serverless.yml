@@ -1,0 +1,33 @@
+# serverless.yml
+
+service: my-python-application
+
+provider:
+  name: aws
+  runtime: python3.7
+  stage: dev
+  region: us-east-2
+
+functions:
+  home:
+    handler: index.home_handler
+    events:
+      - http:
+          path: home
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
+  signIn:
+    handler: index.sign_in_handler
+    events:
+      - http:
+          path: sign-in
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')

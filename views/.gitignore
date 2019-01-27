@@ -1,0 +1,4 @@
+*.pyc
+/__pycache__/*
+/.serverless/*
+__init__.py

@@ -1,25 +1,28 @@
 import json
-from views import common_html
-from views import footer_html
-from views import header_html
-from views import home_html
-from views import sign_in_html
-from views import style_css
-from views import w3_css
 
 def home_handler(event, context):
-    return handle_request(home_html.get_view(), event['method'])
+    return handle_request('home', event['method'])
 
 def sign_in_handler(event, context):
-    return handle_request(sign_in_html.get_view(), event['method'])
+    return handle_request('sign_in', event['method'])
 
-def handle_request(calling_function, action):
+def handle_request(page_name, action):
     if action == 'GET':
-        return get_view(calling_function)
+        return get_view(page_name)
 
-def get_view(page_view):
-    header = header_html.get_view().format(w3_css=w3_css.get_view(),
-                                            style_css=style_css.get_view())
-    footer = footer_html.get_view()
-    return common_html.get_view().format(header=header, view_content=page_view,
-                                        footer=footer)
+def get_view(page_name):
+    with open('views/header.html') as file:
+        header = file.read()
+    with open('views/footer.html') as file:
+        footer = file.read()
+    with open('views/w3.css') as file:
+        w3_css = file.read()
+    with open('views/style.css') as file:
+        style_css = file.read()
+    with open('views/common.html') as file:
+        common = file.read()
+    with open('views/' + page_name + '.html') as file:
+        page_view = file.read()
+
+    header = header.format(w3_css=w3_css, style_css=style_css)
+    return common.format(header=header, view_content=page_view, footer=footer)

@@ -2,3 +2,4 @@
 /__pycache__/*
 /.serverless/*
 __init__.py
+/static_content/*

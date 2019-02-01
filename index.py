@@ -23,6 +23,16 @@ def get_view(page_name):
         common = file.read()
     with open('views/' + page_name + '.html') as file:
         page_view = file.read()
+    with open('views/common.js') as file:
+        common_js = file.read()
+    with open('views/navigation.html') as file:
+        navigation = file.read()
+
 
     header = header.format(w3_css=w3_css, style_css=style_css)
-    return common.format(header=header, view_content=page_view, footer=footer)
+    return common.format(header=header, view_content=page_view, footer=footer,
+                        common_js=common_js, navigation=navigation)
+
+
+def is_logged_in():
+    return False

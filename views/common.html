@@ -1,5 +1,29 @@
 {header}
 <body>
-{view_content}
+<!-- Top menu on small screens -->
+<header class="bgimg w3-display-container w3-grayscale-min" id="home">
+  <div class="w3-display-middle w3-center">
+    <span class="w3-text-black" style="font-size:48px">E Corp<br>2019 Annual Retreat</span>
+  </div>
+  <div class="w3-display-bottomright w3-center w3-padding-large">
+    <span class="w3-text-black"><strong>15 Adr street, 5015</strong></span>
+  </div>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="page-content w3-grayscale w3-large">
+  <div class="w3-content w3-margin-bottom">
+    {view_content}
+  </div>
+<!-- End page content -->
+</div>
+<script>
+{common_js}
+</script>
+
+
 </body>
 {footer}

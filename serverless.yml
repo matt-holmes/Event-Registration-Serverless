@@ -42,3 +42,8 @@ functions:
             headers:
               Content-Type: "'text/html'"
             template: $input.path('$')
+      - http:
+          path: sign-up
+          method: post
+          integration: lambda
+          cors: true

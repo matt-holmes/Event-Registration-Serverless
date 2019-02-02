@@ -1,17 +1,20 @@
 import json
 
 def home_handler(event, context):
-    return handle_request('home', event['method'])
+    return handle_request('home', event)
 
 def sign_in_handler(event, context):
-    return handle_request('sign_in', event['method'])
+    return handle_request('sign_in', event)
 
 def sign_up_handler(event, context):
-    return handle_request('sign_up', event['method'])
+    return handle_request('sign_up', event)
 
-def handle_request(page_name, action):
+def handle_request(page_name, event):
+    action = event['method']
     if action == 'GET':
         return get_view(page_name)
+    elif action == 'POST':
+        return event
 
 def get_view(page_name):
     with open('views/header.html') as file:
@@ -34,8 +37,14 @@ def get_view(page_name):
     js_options = get_js_options(page_name)
 
     header = header.format(w3_css=w3_css, style_css=style_css)
-    return common.format(header=header, view_content=page_view, footer=footer,
-                        common_js=common_js, navigation=navigation, js_options=js_options)
+    return common.format(
+        header=header,
+        view_content=page_view,
+        footer=footer,
+        common_js=common_js,
+        navigation=navigation,
+        js_options=js_options
+    )
 
 
 def is_logged_in():

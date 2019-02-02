@@ -16,3 +16,13 @@ function onClick(element) {
   var captionText = document.getElementById("caption");
   captionText.innerHTML = element.alt;
 }
+
+
+function app() {
+  function init(options) {
+    console.log(options)
+  }
+  return {
+    init: init
+  }
+}

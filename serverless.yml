@@ -31,3 +31,14 @@ functions:
             headers:
               Content-Type: "'text/html'"
             template: $input.path('$')
+  signUp:
+    handler: index.sign_up_handler
+    events:
+      - http:
+          path: sign-up
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')

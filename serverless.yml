@@ -18,7 +18,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:*"
 
 functions:
   home:
@@ -59,12 +59,16 @@ functions:
           method: post
           integration: lambda
           cors: true
+          response:
+            headers:
+              Set-Cookie: integration.response.body.cookie
+
 
 resources:
   Resources:
     usersTable:
       Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
+      DeletionPolicy: Delete
       Properties:
         AttributeDefinitions:
           -

@@ -1,4 +1,7 @@
 import json
+import hashlib
+import uuid
+import boto3
 
 def home_handler(event, context):
     return handle_request('home', event)
@@ -14,6 +17,12 @@ def handle_request(page_name, event):
     if action == 'GET':
         return get_view(page_name)
     elif action == 'POST':
+        if page_name == 'sign_up':
+            user = create_user(event['body'])
+            return {
+                'cookie': 'X-token=' + user['session_token'],
+                'body':user,
+            }
         return event
 
 def get_view(page_name):
@@ -53,3 +62,28 @@ def is_logged_in():
 def get_js_options(page_name):
     js_options = {'page_name':page_name}
     return json.dumps(js_options, ensure_ascii=False)
+
+def create_user(inputs):
+    #TODO validate inputs
+    salt = uuid.uuid4().hex
+    salted_input = inputs['password'].encode('utf-8') + salt.encode('utf-8')
+    hashed_password = hashlib.sha256(salted_input).hexdigest()
+    id = str(uuid.uuid4())
+    user = {
+        'id' : id,
+        'first_name' : inputs['first_name'],
+        'last_name' : inputs['last_name'],
+        'email' : inputs['email'],
+        'username' : inputs['username'],
+        'password' : hashed_password,
+        'session_token' : id + ':' + hashed_password
+    }
+
+    response = get_table_connection('usersTable').put_item(Item=user)
+    return user
+
+def get_table_connection(table_name):
+    dynamodb = boto3.resource('dynamodb',
+                region_name='us-east-2',
+                endpoint_url="https://dynamodb.us-east-2.amazonaws.com")
+    return dynamodb.Table(table_name)

@@ -32,6 +32,17 @@ functions:
             headers:
               Content-Type: "'text/html'"
             template: $input.path('$')
+  sessionExpired:
+    handler: index.session_expired_handler
+    events:
+      - http:
+          path: session-expired
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
   signIn:
     handler: index.sign_in_handler
     events:

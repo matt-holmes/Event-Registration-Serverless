@@ -11,6 +11,24 @@ def sign_in_handler(event, context):
 def sign_up_handler(event, context):
     return handle_request('sign_up', event)
 
+def session_expired_handler(event, context):
+    return handle_request('session_expired', event)
+
+def get_public_pages():
+    return ['sign_in', 'sign_up', 'session_expired']
+
+def is_signed_in(func):
+    def wrapper(page_name, event):
+        if page_name in get_public_pages() or is_token_valid(event['headers']):
+            return func(page_name, event)
+        else:
+            if event['method'] == 'GET':
+                return get_view('session_expired')
+            else:
+                return {'redirect' : 'session-expired'}
+    return wrapper
+
+@is_signed_in
 def handle_request(page_name, event):
     action = event['method']
     if action == 'GET':
@@ -20,6 +38,26 @@ def handle_request(page_name, event):
             return create_user(event['body'])
 
         return event
+
+def is_token_valid(headers):
+    if 'Cookie' not in headers:
+        return False
+    cookie_parts = headers['Cookie'].split('=')
+    if len(cookie_parts) != 2:
+        return False
+    token_parts = cookie_parts[1].split(':')
+    id = token_parts[0]
+    token_hashed_password = token_parts[1]
+    try:
+        response = get_table_connection('usersTable').get_item(
+            Key={
+                'id': id,
+            }
+        )
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        return cookie_parts[1] == response['Item']['session_token']
 
 def get_view(page_name):
     js_options = get_js_options(page_name)
@@ -45,13 +83,10 @@ def get_view_parts(page_name):
                         'common.html', 'common.js', 'navigation.html']
     view_item_names.append(page_name + '.html')
     for item in view_item_names:
-        with open('views/' + item) as file:
+        with open('views/' + item, encoding='utf8') as file:
             view_parts[item] = file.read()
 
     return view_parts
-
-def is_logged_in():
-    return False
 
 def get_js_options(page_name):
     js_options = {'page_name':page_name}
@@ -64,6 +99,7 @@ def create_user(inputs):
     return {
         'cookie': 'X-token=' + user['session_token'],
         'body':user,
+        'redirect':'home'
     }
 
 def get_new_user_data(inputs):

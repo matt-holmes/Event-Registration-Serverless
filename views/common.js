@@ -1,24 +1,25 @@
 function app() {
-  
-  function init(options) {
+
+  function start(options) {
     addEventToSubmit()
   }
 
   function addEventToSubmit() {
     let submitButton = document.querySelector('#submit');
     let self = this;
-    submitButton.addEventListener('click', function(e) {
-        const form = document.querySelector('form');
-        let data = Object.values(form).reduce(
-            (obj,field) => {
-              obj[field.name] = field.value;
-              return obj
-            },
-            {}
-          );
-        submitInputs(data)
-        console.log(data)
-    }, false);
+    if(submitButton !== null) {
+        submitButton.addEventListener('click', function(e) {
+            const form = document.querySelector('form');
+            let data = Object.values(form).reduce(
+                (obj,field) => {
+                  obj[field.name] = field.value;
+                  return obj
+                },
+                {}
+              );
+            submitInputs(data)
+        }, false);
+    }
   }
 
   function submitInputs(data) {
@@ -30,13 +31,14 @@ function app() {
     xhr.onload = function() {
         if (xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
+            window.location.href = response.redirect;
         }
     };
     xhr.send(JSON.stringify(data));
   }
 
   return {
-    init: init
+    start: start
   }
 
 }

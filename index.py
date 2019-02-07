@@ -62,7 +62,9 @@ def is_token_valid(headers):
 def get_view(page_name):
     js_options = get_js_options(page_name)
     view_parts = get_view_parts(page_name)
-
+    if page_name in get_public_pages():
+        view_parts['navigation.html'] = ''
+        
     header = view_parts['header.html'].format(
         w3_css=view_parts['w3.css'],
         style_css=view_parts['style.css']

@@ -2,6 +2,7 @@ function app() {
 
   function start(options) {
     addEventToSubmit()
+    mobileNav()
   }
 
   function addEventToSubmit() {
@@ -35,6 +36,21 @@ function app() {
         }
     };
     xhr.send(JSON.stringify(data));
+  }
+
+  function mobileNav() {
+      let mobileNavButton = document.querySelector('#mobile-nav');
+      let self = this;
+      if(mobileNavButton !== null) {
+          mobileNavButton.addEventListener('click', function(e) {
+              var mobileNavLinks = document.getElementById("mobile-nav-links");
+              if (mobileNavLinks.className.indexOf("w3-show") == -1) {
+                mobileNavLinks.className += " w3-show";
+              } else {
+                mobileNavLinks.className = mobileNavLinks.className.replace(" w3-show", "");
+              }
+          }, false);
+      }
   }
 
   return {

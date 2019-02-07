@@ -67,9 +67,6 @@ def create_user(inputs):
     }
 
 def get_new_user_data(inputs):
-    salt = uuid.uuid4().hex
-    salted_input = inputs['password'].encode('utf-8') + salt.encode('utf-8')
-    hashed_password = hashlib.sha256(salted_input).hexdigest()
     id = str(uuid.uuid4())
     return {
         'id' : id,
@@ -77,9 +74,15 @@ def get_new_user_data(inputs):
         'last_name' : inputs['last_name'],
         'email' : inputs['email'],
         'username' : inputs['username'],
-        'password' : hashed_password,
-        'session_token' : id + ':' + hashed_password
+        'password' : get_hashed_password(inputs['password'], '1*ys2^#~BD'),
+        'session_token' : id + ':' + get_hashed_password(inputs['password']),
     }
+
+def get_hashed_password(password, salt = False):
+    if salt == False:
+        salt = uuid.uuid4().hex
+    salted_input = password.encode('utf-8') + salt.encode('utf-8')
+    return hashlib.sha256(salted_input).hexdigest()
 
 def get_table_connection(table_name):
     try:

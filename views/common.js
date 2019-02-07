@@ -2,12 +2,12 @@ function app() {
 
   function start(options) {
     addEventToSubmit()
-    mobileNav()
+    addEventToMobileNav()
+    addEventToSignOut()
   }
 
   function addEventToSubmit() {
     let submitButton = document.querySelector('#submit');
-    let self = this;
     if(submitButton !== null) {
         submitButton.addEventListener('click', function(e) {
             const form = document.querySelector('form');
@@ -38,9 +38,8 @@ function app() {
     xhr.send(JSON.stringify(data));
   }
 
-  function mobileNav() {
+  function addEventToMobileNav() {
       let mobileNavButton = document.querySelector('#mobile-nav');
-      let self = this;
       if(mobileNavButton !== null) {
           mobileNavButton.addEventListener('click', function(e) {
               var mobileNavLinks = document.getElementById("mobile-nav-links");
@@ -49,6 +48,16 @@ function app() {
               } else {
                 mobileNavLinks.className = mobileNavLinks.className.replace(" w3-show", "");
               }
+          }, false);
+      }
+  }
+
+  function addEventToSignOut() {
+      let signOut = document.querySelector('#sign-out');
+      if(signOut !== null) {
+          signOut.addEventListener('click', function(e) {
+              document.cookie = "X-token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+              window.location.href = 'sign-in';
           }, false);
       }
   }

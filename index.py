@@ -75,14 +75,14 @@ def get_view(page_name):
         view_content=view_parts[page_name + '.html'],
         footer=view_parts['footer.html'],
         common_js=view_parts['common.js'],
-        navigation=view_parts['navigation.html'],
+        nav_links=view_parts['nav_links.html'],
         js_options=js_options
     )
 
 def get_view_parts(page_name):
     view_parts = {}
     view_item_names = ['header.html', 'footer.html', 'w3.css', 'style.css',
-                        'common.html', 'common.js', 'navigation.html']
+                        'common.html', 'common.js', 'nav_links.html']
     view_item_names.append(page_name + '.html')
     for item in view_item_names:
         with open('views/' + item, encoding='utf8') as file:
@@ -116,7 +116,7 @@ def get_new_user_data(inputs):
         'session_token' : id + ':' + get_hashed_password(inputs['password']),
     }
 
-def get_hashed_password(password, password = False):
+def get_hashed_password(password, for_password = False):
     salt = uuid.uuid4().hex
     salted_input = salt.encode() + password.encode()
     if password:

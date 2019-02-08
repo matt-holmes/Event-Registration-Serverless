@@ -64,7 +64,7 @@ def get_view(page_name):
     view_parts = get_view_parts(page_name)
     if page_name in get_public_pages():
         view_parts['navigation.html'] = ''
-        
+
     header = view_parts['header.html'].format(
         w3_css=view_parts['w3.css'],
         style_css=view_parts['style.css']
@@ -112,15 +112,21 @@ def get_new_user_data(inputs):
         'last_name' : inputs['last_name'],
         'email' : inputs['email'],
         'username' : inputs['username'],
-        'password' : get_hashed_password(inputs['password'], '1*ys2^#~BD'),
+        'password' : get_hashed_password(inputs['password'], True),
         'session_token' : id + ':' + get_hashed_password(inputs['password']),
     }
 
-def get_hashed_password(password, salt = False):
-    if salt == False:
-        salt = uuid.uuid4().hex
-    salted_input = password.encode('utf-8') + salt.encode('utf-8')
-    return hashlib.sha256(salted_input).hexdigest()
+def get_hashed_password(password, password = False):
+    salt = uuid.uuid4().hex
+    salted_input = salt.encode() + password.encode()
+    if password:
+        return hashlib.sha256(salted_input).hexdigest() + ':' + salt
+    else: #token
+        return hashlib.sha256(salted_input).hexdigest()
+
+def check_password(hashed_password, user_password):
+    password, salt = hashed_password.split(':')
+    return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
 
 def get_table_connection(table_name):
     try:

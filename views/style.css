@@ -1,3 +1,6 @@
+html { height: 100%; }
+body {height: 100%; }
+
 .bgimg {
   background-position: center;
   background-size: cover;
@@ -6,19 +9,21 @@
   height: 500px;
 }
 
-
-.nav-block {
-  padding-top: 524px;
-}
-
 .page-content {
   padding-top: 64px;
-  padding-left: 225px;
   padding-right: 15px;
   margin-bottom: 64px;
   padding-bottom: 64px;
   min-height: 900px;
   z-index: -1;
+}
+
+.page-content-signed-in {
+    padding-left: 225px;
+}
+
+.page-content-signed-out {
+    padding-left: 15px;
 }
 
 .w3-content {
@@ -30,13 +35,17 @@
 }
 
 .sidebar {
-  margin-top: 500px ;
   padding: 0;
   width: 200px;
   background-color: #d9d9d9;
-  position: fixed;
+  overflow-x: hidden;
   height: 100%;
-  overflow: auto;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
 }
 
 .sidebar a {
@@ -56,6 +65,10 @@ div.content {
   margin-left: 200px;
   padding: 1px 16px;
   height: 1000px;
+}
+
+.footer {
+    height : 63px;
 }
 
 @media screen and (max-width: 992px) {

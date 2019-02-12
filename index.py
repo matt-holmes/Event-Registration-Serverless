@@ -36,6 +36,8 @@ def handle_request(page_name, event):
     elif action == 'POST':
         if page_name == 'sign_up':
             return create_user(event['body'])
+        if page_name == 'sign_in':
+            return authenticate_user(event['body'])
 
         return event
 
@@ -139,6 +141,30 @@ def get_hashed_password(password, for_password = False):
     else: #token
         return hashlib.sha256(salted_input).hexdigest()
 
+def authenticate_user(inputs):
+    try:
+        ClientError
+    except NameError:
+        from botocore.exceptions import ClientError
+
+    try:
+       resp = get_table_connection('usersTable').query(
+            ExpressionAttributeValues={
+               ':v1': {
+                   'S': inputs['username'],
+               },
+            },
+            KeyConditionExpression='username = :v1',
+        )
+    except ClientError:
+        return {
+            'body' : 'user not fount'
+        }
+    else:
+        return {
+            'body' : items
+        }
+
 def check_password(hashed_password, user_password):
     password, salt = hashed_password.split(':')
     return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
@@ -148,6 +174,7 @@ def get_table_connection(table_name):
         boto3
     except NameError:
         import boto3
+        from boto3.dynamodb.conditions import Key, Attr
 
     dynamodb = boto3.resource('dynamodb',
                 region_name='us-east-2',

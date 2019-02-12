@@ -3,11 +3,14 @@ from index import *
 
 class TestIndex(unittest.TestCase):
 
-    def test_home_handler(self):
-        event = {'method' : 'GET'}
+    def test_session_expired_handler(self):
+        event = {
+            'method' : 'GET',
+            'headers' : {}
+        }
         context = {}
         result = home_handler(event, context)
-        self.assertNotEqual(result.find("Home"), -1)
+        self.assertNotEqual(result.find("session"), -1)
 
     def test_sign_in_handler(self):
         event = {'method' : 'GET'}

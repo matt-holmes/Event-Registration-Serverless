@@ -54,6 +54,14 @@ functions:
             headers:
               Content-Type: "'text/html'"
             template: $input.path('$')
+      - http:
+         path: sign-in
+         method: post
+         integration: lambda
+         cors: true
+         response:
+           headers:
+             Set-Cookie: integration.response.body.cookie
   signUp:
     handler: index.sign_up_handler
     events:
@@ -82,14 +90,24 @@ resources:
       DeletionPolicy: Delete
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: id
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: username
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: id
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: usersTable
+        GlobalSecondaryIndexes:
+        - IndexName: userName
+          KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1

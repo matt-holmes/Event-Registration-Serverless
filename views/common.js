@@ -32,7 +32,11 @@ function app() {
     xhr.onload = function() {
         if (xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
-            window.location.href = response.redirect;
+            if(typeof response.redirect != 'undefined') {
+              window.location.href = response.redirect;
+            } else {
+              console.log(response);
+            }
         }
     };
     xhr.send(JSON.stringify(data));

@@ -110,7 +110,7 @@ def create_user(inputs):
     user = User(get_new_user_data(inputs))
     user.save()
     return {
-        'cookie': 'X-token=' + user['session_token'],
+        'cookie': 'X-token=' + user.get('session_token'),
         'body':user.get_attributes(),
         'redirect':'home'
     }

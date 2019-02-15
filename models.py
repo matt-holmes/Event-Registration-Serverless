@@ -12,7 +12,7 @@ class AbstractModel():
     global_secondary_name = ''
 
     def __init__(self, attributes = {}):
-        self._strategy = attributes
+        self.attributes = attributes
 
     def set_attributes(self, attributes):
         self.attributes = attributes
@@ -49,7 +49,7 @@ class AbstractModel():
                     IndexName=self.global_secondary_name,
                     KeyConditionExpression=Key(self.global_secondary_index).eq(key)
                 )
-                if 'Items' in attributes:
+                if 'Items' in attributes and len(attributes['Items']) == 1:
                     attributes = attributes['Items'][0]
 
             self.set_attributes(attributes)

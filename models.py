@@ -70,6 +70,6 @@ class User(AbstractModel):
 
     global_secondary_name = 'userName'
 
-    def check_password(hashed_password, user_password):
-        password, salt = hashed_password.split(':')
-        return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
+    def check_password(request_password):
+        password, salt = self.get('password').split(':')
+        return password == hashlib.sha256(salt.encode() + request_password.encode()).hexdigest()

@@ -1,5 +1,6 @@
 import unittest
 from index import *
+from request_helpers import *
 
 class TestIndex(unittest.TestCase):
 

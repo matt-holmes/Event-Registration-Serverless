@@ -1,6 +1,7 @@
 import json
 import hashlib
 import uuid
+from models import User
 
 def home_handler(event, context):
     return handle_request('home', event)
@@ -50,16 +51,9 @@ def is_token_valid(headers):
     token_parts = cookie_parts[1].split(':')
     id = token_parts[0]
     token_hashed_password = token_parts[1]
-    try:
-        response = get_table_connection('usersTable').get_item(
-            Key={
-                'id': id,
-            }
-        )
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        return cookie_parts[1] == response['Item']['session_token']
+    user = User()
+    user.find(id)
+    return cookie_parts[1] == user.get('session_token')
 
 def get_view(page_name):
     js_options = get_js_options(page_name)
@@ -113,11 +107,11 @@ def get_js_options(page_name):
 
 def create_user(inputs):
     #TODO validate inputs
-    user = get_new_user_data(inputs)
-    response = get_table_connection('usersTable').put_item(Item=user)
+    user = User(get_new_user_data(inputs))
+    user.save()
     return {
         'cookie': 'X-token=' + user['session_token'],
-        'body':user,
+        'body':user.get_attributes(),
         'redirect':'home'
     }
 
@@ -136,47 +130,19 @@ def get_new_user_data(inputs):
 def get_hashed_password(password, for_password = False):
     salt = uuid.uuid4().hex
     salted_input = salt.encode() + password.encode()
-    if password:
+    if for_password:
         return hashlib.sha256(salted_input).hexdigest() + ':' + salt
     else: #token
         return hashlib.sha256(salted_input).hexdigest()
 
 def authenticate_user(inputs):
-    try:
-        ClientError
-    except NameError:
-        from botocore.exceptions import ClientError
-
-    try:
-       resp = get_table_connection('usersTable').query(
-            ExpressionAttributeValues={
-               ':v1': {
-                   'S': inputs['username'],
-               },
-            },
-            KeyConditionExpression='username = :v1',
-        )
-    except ClientError:
+    user = User()
+    user.find(inputs['username'], True)
+    if(user.get('id') == None):
         return {
-            'body' : 'user not fount'
+            'body' : 'user not found'
         }
     else:
         return {
-            'body' : items
+            'body' : user.get_attributes()
         }
-
-def check_password(hashed_password, user_password):
-    password, salt = hashed_password.split(':')
-    return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
-
-def get_table_connection(table_name):
-    try:
-        boto3
-    except NameError:
-        import boto3
-        from boto3.dynamodb.conditions import Key, Attr
-
-    dynamodb = boto3.resource('dynamodb',
-                region_name='us-east-2',
-                endpoint_url="https://dynamodb.us-east-2.amazonaws.com")
-    return dynamodb.Table(table_name)

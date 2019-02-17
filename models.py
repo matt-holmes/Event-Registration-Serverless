@@ -1,6 +1,27 @@
+import hashlib
 from database_connector import get_table_connection
+from abc import ABCMeta, abstractproperty
 
-class AbstractModel():
+class AbstractModel(metaclass=ABCMeta):
+    @abstractproperty
+    def table_name(self):
+        pass
+
+    @abstractproperty
+    def primary_key(self):
+        pass
+
+    @abstractproperty
+    def global_secondary_index(self):
+        pass
+
+    @abstractproperty
+    def global_secondary_name(self):
+        pass
+
+
+
+class Model(AbstractModel):
     attributes = {}
 
     table_name = ''
@@ -28,6 +49,9 @@ class AbstractModel():
             return self.attributes[attribute]
         else:
             return None
+
+    def set(self, attribute, value):
+        self.attributes[attribute] = value
 
     def find(self, key = False, gsi = False):
         try:
@@ -61,7 +85,7 @@ class AbstractModel():
 
 
 
-class User(AbstractModel):
+class User(Model):
     table_name = 'usersTable'
 
     primary_key = 'id'
@@ -70,6 +94,6 @@ class User(AbstractModel):
 
     global_secondary_name = 'userName'
 
-    def check_password(request_password):
+    def check_password(self, request_password):
         password, salt = self.get('password').split(':')
         return password == hashlib.sha256(salt.encode() + request_password.encode()).hexdigest()

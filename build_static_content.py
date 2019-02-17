@@ -1,11 +1,12 @@
-from index import get_view
+from html_renderer import View
 
 def build_static_content():
     files = ['sign_in', 'home', 'sign_up', 'session_expired'];
 
     for file in files:
         with open('static_content/' + file + '.html', 'w+', encoding='utf-8') as newFile:
-            newFile.write(get_view(file))
+            view = View()
+            newFile.write(view.make(file))
 
 
 if __name__ == '__main__':

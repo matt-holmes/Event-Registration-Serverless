@@ -80,9 +80,31 @@ def authenticate_user(inputs):
     user.find(inputs['username'], True)
     if(user.get('id') == None):
         return {
-            'body' : 'user not found'
+            'body' : {
+                'errors': [
+                    {'field' : 'username',
+                    'message' : "Username not found."}
+                ]
+            }
         }
     else:
-        return {
-            'body' : user.get_attributes()
-        }
+        user.find(user.get('id'))
+        if(user.check_password(inputs['password'])):
+            hashed_password = get_hashed_password(inputs['password'])
+            session_token = user.get('id') + ':' + hashed_password
+            user.set('session_token', session_token)
+            user.save()
+            return {
+                'cookie': 'X-token=' + user.get('session_token'),
+                'body':user.get_attributes(),
+                'redirect':'home'
+            }
+        else:
+            return {
+                'body' : {
+                    'errors': [
+                        {'field' : 'password',
+                        'message' : "Incorrect password."}
+                    ]
+                }
+            }

@@ -12,12 +12,12 @@ function app() {
       submitButton.addEventListener('click', function(e) {
         const form = document.querySelector('form');
         let data = Object.values(form).reduce(
-            (obj,field) => {
-              obj[field.name] = field.value;
-              return obj
-            },
-            {}
-          );
+          (obj,field) => {
+            obj[field.name] = field.value;
+            return obj
+          },
+          {}
+        );
         submitInputs(data)
       }, false);
     }
@@ -36,7 +36,7 @@ function app() {
           window.location.href = response.redirect;
         } else {
           console.log(response);
-          if(typeof response.body != 'undefined' && 
+          if(typeof response.body != 'undefined' &&
             typeof response.body.errors != 'undefined') {
             console.log('here1')
             processValidation(response.body.errors);

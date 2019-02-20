@@ -38,7 +38,6 @@ function app() {
           console.log(response);
           if(typeof response.body != 'undefined' &&
             typeof response.body.errors != 'undefined') {
-            console.log('here1')
             processValidation(response.body.errors);
           }
         }

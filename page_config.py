@@ -14,6 +14,35 @@ def get_page_config(page_name):
                     'label' : 'Password'
                 }
             }
+        },
+        'sign_up' : {
+            'fields' : {
+                'first_name' : {
+                    'required' : True,
+                    'label' : 'First Name'
+                },
+                'last_name' : {
+                    'required' : True,
+                    'label' : 'Last Name'
+                },
+                'email' : {
+                    'required' : True,
+                    'label' : 'Email'
+                },
+                'username' : {
+                    'required' : True,
+                    'label' : 'Username'
+                },
+                'password' : {
+                    'required' : True,
+                    'label' : 'Password'
+                },
+                'confirm_password' : {
+                    'required' : True,
+                    'equals' : 'password',
+                    'label' : 'Confirm Password'
+                }
+            }
         }
     }
 

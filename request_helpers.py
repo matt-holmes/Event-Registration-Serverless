@@ -132,6 +132,17 @@ def validate_form(page_name, inputs):
                             'message' : "{label} is required.".format(label=label)
                         }
                     )
+            if 'equals' in meta:
+                if( field not in inputs or meta['equals'] not in inputs) or inputs[field] != inputs[meta['equals']]:
+                    is_valid = False
+                    label = meta['label']
+                    label2 = page_config['fields'][meta['equals']]['label']
+                    response['body']['errors'].append(
+                        {
+                            'field' : field,
+                            'message' : "{label} should be equal to {label2}.".format(label=label, label2=label2)
+                        }
+                    )
     if is_valid == False:
         return response
     return is_valid

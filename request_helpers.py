@@ -3,7 +3,7 @@ import hashlib
 import uuid
 from models import User
 from html_renderer import View
-from page_config import get_public_pages
+from page_config import get_public_pages, get_page_config
 
 def is_signed_in(func):
     def wrapper(page_name, event):
@@ -24,6 +24,9 @@ def handle_request(page_name, event):
         view = View()
         return view.make(page_name)
     elif action == 'POST':
+        validate_form = validate_form(page_name, event['body'])
+        if validate_form != True:
+            return validate_form
         if page_name == 'sign_up':
             return create_user(event['body'])
         if page_name == 'sign_in':
@@ -104,7 +107,31 @@ def authenticate_user(inputs):
                 'body' : {
                     'errors': [
                         {'field' : 'password',
-                        'message' : "Incorrect password."}
+                        'message' : "Incorrect Password."}
                     ]
                 }
             }
+
+def validate_form(page_name, inputs):
+    page_config = get_page_config(page_name)
+    is_valid = True
+    response =  {
+        'body' : {
+            'errors': []
+        }
+    }
+    if page_config != None:
+        for field, meta in page_config['fields'].items():
+            if 'required' in meta and meta['required'] == True:
+                if field not in inputs or inputs[field] == '':
+                    is_valid = False
+                    label = meta['label']
+                    response['body']['errors'].append(
+                        {
+                            'field' : field,
+                            'message' : "{label} is required.".format(label=label)
+                        }
+                    )
+    if is_valid == False:
+        return response
+    return is_valid

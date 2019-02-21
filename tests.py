@@ -64,8 +64,23 @@ class TestIndex(unittest.TestCase):
         self.assertEqual(1, len(get_hashed_password('test').split(':')))
         self.assertEqual(2, len(get_hashed_password('test', True).split(':')))
 
+    def test_validate_form(self):
+        inputs = {
+            'username' : 'test',
+            'password' : 'password'
+        }
+        self.assertTrue(validate_form('sign_in', inputs))
 
-
+        inputs = {
+            'username' : '',
+        }
+        response = validate_form('sign_in', inputs)
+        self.assertEqual('username', response['body']['errors'][0]['field'])
+        self.assertEqual('Username is required.',
+                            response['body']['errors'][0]['message'])
+        self.assertEqual('password', response['body']['errors'][1]['field'])
+        self.assertEqual('Password is required.',
+                            response['body']['errors'][1]['message'])
 
 
 if __name__ == '__main__':

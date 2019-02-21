@@ -24,9 +24,9 @@ def handle_request(page_name, event):
         view = View()
         return view.make(page_name)
     elif action == 'POST':
-        validate_form = validate_form(page_name, event['body'])
-        if validate_form != True:
-            return validate_form
+        validate_form_result = validate_form(page_name, event['body'])
+        if validate_form_result != True:
+            return validate_form_result
         if page_name == 'sign_up':
             return create_user(event['body'])
         if page_name == 'sign_in':

@@ -4,6 +4,7 @@ import uuid
 from models import User
 from html_renderer import View
 from page_config import get_public_pages, get_page_config
+import re
 
 def is_signed_in(func):
     def wrapper(page_name, event):
@@ -49,7 +50,17 @@ def is_token_valid(headers):
 
 
 def create_user(inputs):
-    #TODO validate inputs
+    user = User()
+    is_username_unique = user.find(inputs['username'], True)
+    if is_username_unique == False:
+        return {
+            'body' : {
+                'errors': [
+                    {'field' : 'username',
+                    'message' : "Username is already taken."}
+                ]
+            }
+        }
     user = User(get_new_user_data(inputs))
     user.save()
     return {
@@ -133,7 +144,7 @@ def validate_form(page_name, inputs):
                         }
                     )
             if 'equals' in meta:
-                if( field not in inputs or meta['equals'] not in inputs) or inputs[field] != inputs[meta['equals']]:
+                if (field not in inputs or meta['equals'] not in inputs) or inputs[field] != inputs[meta['equals']]:
                     is_valid = False
                     label = meta['label']
                     label2 = page_config['fields'][meta['equals']]['label']
@@ -141,6 +152,17 @@ def validate_form(page_name, inputs):
                         {
                             'field' : field,
                             'message' : "{label} should be equal to {label2}.".format(label=label, label2=label2)
+                        }
+                    )
+            if 'type' in meta:
+                email_pattern = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
+                if meta['type'] == 'email' and re.match(email_pattern, inputs['email']) == None:
+                    is_valid = False
+                    label = meta['label']
+                    response['body']['errors'].append(
+                        {
+                            'field' : field,
+                            'message' : "{label} is invalid.".format(label=label)
                         }
                     )
     if is_valid == False:

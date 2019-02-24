@@ -27,7 +27,8 @@ def get_page_config(page_name):
                 },
                 'email' : {
                     'required' : True,
-                    'label' : 'Email'
+                    'label' : 'Email',
+                    'type' : 'email'
                 },
                 'username' : {
                     'required' : True,

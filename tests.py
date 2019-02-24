@@ -100,5 +100,22 @@ class TestIndex(unittest.TestCase):
                             response['body']['errors'][0]['message'])
 
 
+    def test_validate_form_valid_email(self):
+        inputs = {
+            'first_name' : 'Jone',
+            'last_name' : 'Doe',
+            'email' : 'jdoe@test.com',
+            'username' : 'jdoe',
+            'password' : 'password',
+            'confirm_password' : 'password'
+        }
+        self.assertTrue(validate_form('sign_up', inputs))
+
+        inputs['email'] = 'jdoetest.com'
+        response = validate_form('sign_up', inputs)
+        self.assertEqual('email', response['body']['errors'][0]['field'])
+        self.assertEqual('Email is invalid.',
+                            response['body']['errors'][0]['message'])
+
 if __name__ == '__main__':
     unittest.main()

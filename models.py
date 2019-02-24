@@ -75,6 +75,8 @@ class Model(AbstractModel):
                 )
                 if 'Items' in attributes and len(attributes['Items']) == 1:
                     attributes = attributes['Items'][0]
+                else:
+                    return False
 
             self.set_attributes(attributes)
         except ClientError:

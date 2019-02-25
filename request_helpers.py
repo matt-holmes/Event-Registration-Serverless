@@ -51,8 +51,8 @@ def is_token_valid(headers):
 
 def create_user(inputs):
     user = User()
-    is_username_unique = user.find(inputs['username'], True)
-    if is_username_unique == False:
+    user_exists = user.find(inputs['username'], True)
+    if user_exists != False:
         return {
             'body' : {
                 'errors': [

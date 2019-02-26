@@ -134,37 +134,58 @@ def validate_form(page_name, inputs):
     if page_config != None:
         for field, meta in page_config['fields'].items():
             if 'required' in meta and meta['required'] == True:
-                if field not in inputs or inputs[field] == '':
-                    is_valid = False
-                    label = meta['label']
-                    response['body']['errors'].append(
-                        {
-                            'field' : field,
-                            'message' : "{label} is required.".format(label=label)
-                        }
-                    )
+                validation_response = get_required_validation_response(is_valid,
+                                                    field, inputs, meta, response)
+                is_valid = validation_response['is_valid']
+                response = validation_response['response']
             if 'equals' in meta:
-                if (field not in inputs or meta['equals'] not in inputs) or inputs[field] != inputs[meta['equals']]:
-                    is_valid = False
-                    label = meta['label']
-                    label2 = page_config['fields'][meta['equals']]['label']
-                    response['body']['errors'].append(
-                        {
-                            'field' : field,
-                            'message' : "{label} should be equal to {label2}.".format(label=label, label2=label2)
-                        }
-                    )
+                validation_response = get_equals_validation_response(is_valid,
+                                                    field, inputs, meta, response, page_config)
+                is_valid = validation_response['is_valid']
+                response = validation_response['response']
             if 'type' in meta:
-                email_pattern = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
-                if meta['type'] == 'email' and re.match(email_pattern, inputs['email']) == None:
-                    is_valid = False
-                    label = meta['label']
-                    response['body']['errors'].append(
-                        {
-                            'field' : field,
-                            'message' : "{label} is invalid.".format(label=label)
-                        }
-                    )
+                validation_response = get_type_validation_response(is_valid,
+                                                    field, inputs, meta, response)
+                is_valid = validation_response['is_valid']
+                response = validation_response['response']
     if is_valid == False:
         return response
     return is_valid
+
+def get_required_validation_response(is_valid, field, inputs, meta, response):
+    if field not in inputs or inputs[field] == '':
+        is_valid = False
+        label = meta['label']
+        response['body']['errors'].append(
+            {
+                'field' : field,
+                'message' : "{label} is required.".format(label=label)
+            }
+        )
+    return {'is_valid' : is_valid, 'response': response}
+
+def get_equals_validation_response(is_valid, field, inputs, meta, response, page_config):
+    if (field not in inputs or meta['equals'] not in inputs) or inputs[field] != inputs[meta['equals']]:
+        is_valid = False
+        label = meta['label']
+        label2 = page_config['fields'][meta['equals']]['label']
+        response['body']['errors'].append(
+            {
+                'field' : field,
+                'message' : "{label} should be equal to {label2}.".format(label=label, label2=label2)
+            }
+        )
+    return {'is_valid' : is_valid, 'response': response}
+
+def get_type_validation_response(is_valid, field, inputs, meta, response):
+    email_pattern = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
+    if meta['type'] == 'email' and re.match(email_pattern, inputs['email']) == None:
+        is_valid = False
+        label = meta['label']
+        response['body']['errors'].append(
+            {
+                'field' : field,
+                'message' : "{label} is invalid.".format(label=label)
+            }
+        )
+    return {'is_valid' : is_valid, 'response': response}

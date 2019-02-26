@@ -86,7 +86,7 @@ def get_hashed_password(password, for_password = False):
     salted_input = salt.encode() + password.encode()
     if for_password:
         return hashlib.sha256(salted_input).hexdigest() + ':' + salt
-    else: #token
+    else:
         return hashlib.sha256(salted_input).hexdigest()
 
 def authenticate_user(inputs):

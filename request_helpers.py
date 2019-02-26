@@ -53,14 +53,8 @@ def create_user(inputs):
     user = User()
     user_exists = user.find(inputs['username'], True)
     if user_exists != False:
-        return {
-            'body' : {
-                'errors': [
-                    {'field' : 'username',
-                    'message' : "Username is already taken."}
-                ]
-            }
-        }
+        return get_validation_error_response('username', "Username is already taken.")
+
     user = User(get_new_user_data(inputs))
     user.save()
     return {
@@ -93,14 +87,7 @@ def authenticate_user(inputs):
     user = User()
     user.find(inputs['username'], True)
     if(user.get('id') == None):
-        return {
-            'body' : {
-                'errors': [
-                    {'field' : 'username',
-                    'message' : "Username not found."}
-                ]
-            }
-        }
+        return get_validation_error_response('username', "Username not found.")
     else:
         user.find(user.get('id'))
         if(user.check_password(inputs['password'])):
@@ -114,14 +101,7 @@ def authenticate_user(inputs):
                 'redirect':'home'
             }
         else:
-            return {
-                'body' : {
-                    'errors': [
-                        {'field' : 'password',
-                        'message' : "Incorrect Password."}
-                    ]
-                }
-            }
+            return get_validation_error_response('password', "Incorrect Password.")
 
 def validate_form(page_name, inputs):
     page_config = get_page_config(page_name)
@@ -156,36 +136,53 @@ def get_required_validation_response(is_valid, field, inputs, meta, response):
     if field not in inputs or inputs[field] == '':
         is_valid = False
         label = meta['label']
-        response['body']['errors'].append(
-            {
-                'field' : field,
-                'message' : "{label} is required.".format(label=label)
-            }
-        )
-    return {'is_valid' : is_valid, 'response': response}
+        message = "{label} is required.".format(label=label)
+        response = get_validation_error_response(field, message, response)
+    return {
+        'is_valid' : is_valid,
+        'response': response
+    }
 
 def get_equals_validation_response(is_valid, field, inputs, meta, response, page_config):
     if (field not in inputs or meta['equals'] not in inputs) or inputs[field] != inputs[meta['equals']]:
         is_valid = False
         label = meta['label']
         label2 = page_config['fields'][meta['equals']]['label']
-        response['body']['errors'].append(
-            {
-                'field' : field,
-                'message' : "{label} should be equal to {label2}.".format(label=label, label2=label2)
-            }
-        )
-    return {'is_valid' : is_valid, 'response': response}
+        message = "{label} should be equal to {label2}.".format(label=label, label2=label2)
+        response = get_validation_error_response(field, message, response)
+
+    return {
+        'is_valid' : is_valid,
+        'response': response
+    }
 
 def get_type_validation_response(is_valid, field, inputs, meta, response):
     email_pattern = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
     if meta['type'] == 'email' and re.match(email_pattern, inputs['email']) == None:
         is_valid = False
         label = meta['label']
-        response['body']['errors'].append(
-            {
-                'field' : field,
-                'message' : "{label} is invalid.".format(label=label)
+        message = "{label} is invalid.".format(label=label)
+        response = get_validation_error_response(field, message, response)
+
+    return {
+        'is_valid' : is_valid,
+        'response': response
+    }
+
+def get_validation_error_response(field, message, response=None):
+    error = {
+        'field' : field,
+        'message' : message
+    }
+    if response != None:
+        response['body']['errors'].append(error)
+    else:
+        response = {
+            'body' : {
+                'errors': [
+                    error
+                ]
             }
-        )
-    return {'is_valid' : is_valid, 'response': response}
+        }
+
+    return response

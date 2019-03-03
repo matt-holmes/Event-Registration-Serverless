@@ -2,7 +2,12 @@ from page_config import get_public_pages
 import json
 
 class View():
-    def make(self, page_name):
+    def make(self, page_name, user=None):
+        if(user):
+            user_attribites = user.get_attributes()
+        else:
+            user_attribites = {}
+
         js_options = self.get_js_options(page_name)
         view_parts = self.get_view_parts(page_name)
         page_content_signed = 'page-content-signed-in'
@@ -18,7 +23,8 @@ class View():
         )
 
         top_nav = view_parts['top_nav.html'].format(
-            nav_links=view_parts['nav_links.html']
+            nav_links=view_parts['nav_links.html'],
+            user=user_attribites
         )
 
         side_nav = view_parts['side_nav.html'].format(
@@ -33,7 +39,8 @@ class View():
             top_nav=top_nav,
             side_nav=side_nav,
             js_options=js_options,
-            page_content_signed=page_content_signed
+            page_content_signed=page_content_signed,
+            user=user_attribites
         )
 
     def get_view_parts(self, page_name):

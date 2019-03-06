@@ -8,7 +8,9 @@ import re
 
 def is_signed_in(func):
     def wrapper(page_name, event):
-        if page_name in get_public_pages() or is_token_valid(event['headers']):
+        user = get_user_from_token(event['headers'])
+        event['user'] = user
+        if page_name in get_public_pages() or user:
             return func(page_name, event)
         else:
             if event['method'] == 'GET':
@@ -23,7 +25,7 @@ def handle_request(page_name, event):
     action = event['method']
     if action == 'GET':
         view = View()
-        return view.make(page_name)
+        return view.make(page_name, event['user'])
     elif action == 'POST':
         validate_form_result = validate_form(page_name, event['body'])
         if validate_form_result != True:
@@ -35,7 +37,7 @@ def handle_request(page_name, event):
 
         return event
 
-def is_token_valid(headers):
+def get_user_from_token(headers):
     if 'Cookie' not in headers:
         return False
     cookie_parts = headers['Cookie'].split('=')
@@ -46,7 +48,9 @@ def is_token_valid(headers):
     token_hashed_password = token_parts[1]
     user = User()
     user.find(id)
-    return cookie_parts[1] == user.get('session_token')
+    if cookie_parts[1] == user.get('session_token'):
+        return user
+    return None
 
 
 def create_user(inputs):

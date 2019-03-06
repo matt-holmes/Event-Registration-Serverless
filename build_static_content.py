@@ -1,7 +1,7 @@
 from html_renderer import View
 
 def build_static_content():
-    files = ['sign_in', 'home', 'sign_up', 'session_expired'];
+    files = ['sign_in', 'home', 'sign_up', 'session_expired', 'activities', 'register', 'register-rsvp'];
 
     for file in files:
         with open('static_content/' + file + '.html', 'w+', encoding='utf-8') as newFile:

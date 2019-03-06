@@ -32,6 +32,39 @@ functions:
             headers:
               Content-Type: "'text/html'"
             template: $input.path('$')
+  actvities:
+    handler: index.activites_handler
+    events:
+      - http:
+          path: activities
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
+  register:
+    handler: index.register_handler
+    events:
+      - http:
+          path: register
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
+  registerComplete:
+    handler: index.register_complete_handler
+    events:
+      - http:
+          path: register-complete
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
   sessionExpired:
     handler: index.session_expired_handler
     events:
@@ -81,6 +114,70 @@ functions:
           response:
             headers:
               Set-Cookie: integration.response.body.cookie
+   registerRsvp:
+     handler: index.register_rsvp_handler
+     events:
+       - http:
+           path: register-rsvp
+           method: get
+           integration: lambda
+           response:
+             headers:
+               Content-Type: "'text/html'"
+             template: $input.path('$')
+       - http:
+          path: register-rsvp
+          method: post
+          integration: lambda
+          cors: true
+  registerProfile:
+    handler: index.register_profile_handler
+    events:
+      - http:
+          path: register-profile
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
+      - http:
+         path: register-profile
+         method: post
+         integration: lambda
+         cors: true
+  registerActivities:
+    handler: index.register_activities_handler
+    events:
+      - http:
+          path: register-activities
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
+      - http:
+         path: register-activities
+         method: post
+         integration: lambda
+         cors: true
+  registerHotel:
+    handler: index.register_hotel_handler
+    events:
+      - http:
+          path: register-hotel
+          method: get
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
+      - http:
+         path: register-hotel
+         method: post
+         integration: lambda
+         cors: true
 
 
 resources:

@@ -11,4 +11,24 @@ def sign_up_handler(event, context):
 
 def session_expired_handler(event, context):
     return handle_request('session_expired', event)
-    
+
+def activites_handler(event, context):
+    return handle_request('activites', event)
+
+def register_handler(event, context):
+    return handle_request('register', event)
+
+def register_complete_handler(event, context):
+    return handle_request('register_complete', event)
+
+def register_rsvp_handler(event, context):
+    return handle_request('register_rsvp', event)
+
+def register_profile_handler(event, context):
+    return handle_request('register_profile', event)
+
+def register_activities_handler(event, context):
+    return handle_request('register_activities', event)
+
+def register_hotel_handler(event, context):
+    return handle_request('register_hotel', event)

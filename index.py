@@ -12,8 +12,8 @@ def sign_up_handler(event, context):
 def session_expired_handler(event, context):
     return handle_request('session_expired', event)
 
-def activites_handler(event, context):
-    return handle_request('activites', event)
+def activities_handler(event, context):
+    return handle_request('activities', event)
 
 def register_handler(event, context):
     return handle_request('register', event)

@@ -33,7 +33,7 @@ functions:
               Content-Type: "'text/html'"
             template: $input.path('$')
   actvities:
-    handler: index.activites_handler
+    handler: index.activities_handler
     events:
       - http:
           path: activities
@@ -114,22 +114,22 @@ functions:
           response:
             headers:
               Set-Cookie: integration.response.body.cookie
-   registerRsvp:
-     handler: index.register_rsvp_handler
-     events:
-       - http:
-           path: register-rsvp
-           method: get
-           integration: lambda
-           response:
-             headers:
-               Content-Type: "'text/html'"
-             template: $input.path('$')
-       - http:
+  registerRSVP:
+    handler: index.register_rsvp_handler
+    events:
+      - http:
           path: register-rsvp
-          method: post
+          method: get
           integration: lambda
-          cors: true
+          response:
+            headers:
+              Content-Type: "'text/html'"
+            template: $input.path('$')
+      - http:
+         path: register-rsvp
+         method: post
+         integration: lambda
+         cors: true
   registerProfile:
     handler: index.register_profile_handler
     events:

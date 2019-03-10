@@ -99,3 +99,15 @@ class User(Model):
     def check_password(self, request_password):
         password, salt = self.get('password').split(':')
         return password == hashlib.sha256(salt.encode() + request_password.encode()).hexdigest()
+
+    def get_current_step(self):
+        if self.get('rsvp_step_status') == None:
+            return 'register-rsvp'
+        elif self.get('profile_step_status') == None:
+            return 'register-profile'
+        elif self.get('activities_step_status') == None:
+            return 'register-activities'
+        elif self.get('hotel_step_status') == None:
+            return 'register-hotel'
+        else:
+            return 'register-complete'

@@ -9,18 +9,29 @@ function app() {
   function addEventToSubmit() {
     let submitButton = document.querySelector('#submit');
     if(submitButton !== null) {
+      document.body.addEventListener( 'keyup', function (e) {
+        if ( e.keyCode == 13 ) {
+          submitAction();
+        }
+      });
+
       submitButton.addEventListener('click', function(e) {
-        const form = document.querySelector('form');
-        let data = Object.values(form).reduce(
-          (obj,field) => {
-            obj[field.name] = field.value;
-            return obj
-          },
-          {}
-        );
-        submitInputs(data)
+        submitAction();
       }, false);
     }
+  }
+
+  function submitAction() {
+    document.body.style.cursor = 'progress';
+    const form = document.querySelector('form');
+    let data = Object.values(form).reduce(
+      (obj,field) => {
+        obj[field.name] = field.value;
+        return obj
+      },
+      {}
+    );
+    submitInputs(data)
   }
 
   function submitInputs(data) {
@@ -42,6 +53,8 @@ function app() {
           }
         }
       }
+      document.body.style.cursor = 'default';
+
     };
     xhr.send(JSON.stringify(data));
   }

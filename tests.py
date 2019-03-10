@@ -15,7 +15,7 @@ class TestIndex(unittest.TestCase):
         self.assertNotEqual(result.find("session"), -1)
 
     def test_sign_in_handler(self):
-        event = {'method' : 'GET'}
+        event = {'method' : 'GET', 'headers' : 'test'}
         context = {}
         result = sign_in_handler(event, context)
         self.assertNotEqual(result.find("Sign In"), -1)
@@ -116,6 +116,32 @@ class TestIndex(unittest.TestCase):
         self.assertEqual('email', response['body']['errors'][0]['field'])
         self.assertEqual('Email is invalid.',
                             response['body']['errors'][0]['message'])
+
+    def test_get_current_step(self):
+        user = User()
+        user.set('rsvp_step_status', None)
+        self.assertEqual('register-rsvp', user.get_current_step())
+        user.set('rsvp_step_status', 'complete')
+        user.set('profile_step_status', None)
+        self.assertEqual('register-profile', user.get_current_step())
+        user.set('activities_step_status', None)
+        user.set('profile_step_status', 'complete')
+        self.assertEqual('register-activities', user.get_current_step())
+        user.set('activities_step_status', 'complete')
+        user.set('hotel_step_status', None)
+        self.assertEqual('register-hotel', user.get_current_step())
+        user.set('hotel_step_status', 'complete')
+        self.assertEqual('register-complete', user.get_current_step())
+
+    def test_is_active(self):
+        view = View()
+        self.assertEqual('active', view.is_active('active_home', 'home'))
+        self.assertEqual('', view.is_active('active_home', 'not_home'))
+        self.assertEqual('active', view.is_active('active_activities', 'activities'))
+        self.assertEqual('', view.is_active('active_activities', 'not_activities'))
+        self.assertEqual('active', view.is_active('active_register', 'register_rsvp'))
+        self.assertEqual('', view.is_active('active_register', 'activities'))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,4 @@
-from page_config import get_public_pages
+from page_config import get_public_pages, get_registration_pages
 import json
 
 class View():
@@ -8,27 +8,36 @@ class View():
         else:
             user_attribites = {}
 
-        js_options = self.get_js_options(page_name)
+        js_options = self.get_js_options(page_name, user)
         view_parts = self.get_view_parts(page_name)
         page_content_signed = 'page-content-signed-in'
         if page_name in get_public_pages():
-            view_parts['top_nav.html'] = ''
-            view_parts['side_nav.html'] = ''
-            page_content_logged_in = ''
+            top_nav = ''
+            side_nav = ''
             page_content_signed = 'page-content-signed-out'
+        else:
+            top_nav = view_parts['top_nav.html'].format(
+                nav_links=view_parts['nav_links.html'].format(
+                    current_step=user.get_current_step(),
+                    active_home = self.is_active('active_home', page_name),
+                    active_activities = self.is_active('active_activities', page_name),
+                    active_register = self.is_active('active_register', page_name)
+                ),
+                user=user_attribites
+            )
+
+            side_nav = view_parts['side_nav.html'].format(
+                nav_links=view_parts['nav_links.html'].format(
+                    current_step=user.get_current_step(),
+                    active_home = self.is_active('active_home', page_name),
+                    active_activities = self.is_active('active_activities', page_name),
+                    active_register = self.is_active('active_register', page_name)
+                )
+            )
 
         header = view_parts['header.html'].format(
             w3_css=view_parts['w3.css'],
             style_css=view_parts['style.css']
-        )
-
-        top_nav = view_parts['top_nav.html'].format(
-            nav_links=view_parts['nav_links.html'],
-            user=user_attribites
-        )
-
-        side_nav = view_parts['side_nav.html'].format(
-            nav_links=view_parts['nav_links.html']
         )
 
         return view_parts['common.html'].format(
@@ -55,6 +64,15 @@ class View():
 
         return view_parts
 
-    def get_js_options(self, page_name):
+    def get_js_options(self, page_name, user):
         js_options = {'page_name':page_name}
         return json.dumps(js_options, ensure_ascii=False)
+
+    def is_active(self, link, page_name):
+        if link == 'active_home' and page_name == 'home':
+            return 'active'
+        if link == 'active_activities' and page_name == 'activities':
+            return 'active'
+        if link == 'active_register' and page_name in get_registration_pages():
+            return 'active'
+        return ''

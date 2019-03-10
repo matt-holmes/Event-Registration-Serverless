@@ -43,17 +43,6 @@ functions:
             headers:
               Content-Type: "'text/html'"
             template: $input.path('$')
-  register:
-    handler: index.register_handler
-    events:
-      - http:
-          path: register
-          method: get
-          integration: lambda
-          response:
-            headers:
-              Content-Type: "'text/html'"
-            template: $input.path('$')
   registerComplete:
     handler: index.register_complete_handler
     events:

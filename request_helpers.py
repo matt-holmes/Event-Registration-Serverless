@@ -77,6 +77,11 @@ def get_new_user_data(inputs):
         'username' : inputs['username'],
         'password' : get_hashed_password(inputs['password'], True),
         'session_token' : id + ':' + get_hashed_password(inputs['password']),
+        'rsvp_step_status' : None,
+        'profile_step_status' : None,
+        'activities_step_status' : None,
+        'hotel_step_status' : None,
+        'status' : 'incomplete'
     }
 
 def get_hashed_password(password, for_password = False):

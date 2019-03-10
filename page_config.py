@@ -1,6 +1,15 @@
 def get_public_pages():
     return ['sign_in', 'sign_up', 'session_expired']
 
+def get_registration_pages():
+    return [
+        'register_rsvp',
+        'register_activities',
+        'register_profile',
+        'register_hotel',
+        'register_complete'
+    ]
+
 def get_page_config(page_name):
     pages_config = {
         'sign_in' : {

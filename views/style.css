@@ -71,6 +71,15 @@ div.content {
     height : 63px;
 }
 
+.row {
+  padding: 12px;
+}
+
+.progress-bar {
+  margin-top: 10px;
+  background-color: #d9d9d9;
+}
+
 @media screen and (max-width: 992px) {
   .sidebar {
     width: 100%;

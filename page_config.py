@@ -53,7 +53,47 @@ def get_page_config(page_name):
                     'label' : 'Confirm Password'
                 }
             }
-        }
+        },
+        'register_rsvp' : {
+            'fields' : {
+                'rsvp' : {
+                    'required' : True,
+                    'label' : 'Will you be attending?',
+                    'type' : 'boolean',
+                },
+            },
+            'layout' : [
+                ['rsvp']
+            ]
+        },
+        'register_profile' : {
+            'fields' : {
+                'first_name' : {
+                    'required' : True,
+                    'label' : 'First Name',
+                    'type' : 'varchar'
+                },
+                'middle_name' : {
+                    'required' : True,
+                    'label' : 'Middle Name',
+                    'type' : 'varchar'
+                },
+                'last_name' : {
+                    'required' : True,
+                    'label' : 'Last Name',
+                    'type' : 'varchar'
+                },
+                'email' : {
+                    'required' : True,
+                    'label' : 'Email',
+                    'type' : 'email'
+                },
+            },
+            'layout' : [
+                ['first_name', 'middle_name', 'last_name'],
+                ['email']
+            ]
+        },
     }
 
     if page_name in pages_config:

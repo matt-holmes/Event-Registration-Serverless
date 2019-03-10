@@ -2,7 +2,15 @@ from html_renderer import View
 from models import User
 
 def build_static_content():
-    files = ['sign_in', 'home', 'sign_up', 'session_expired', 'activities', 'register_rsvp'];
+    files = [
+                'sign_in',
+                'home',
+                'sign_up',
+                'session_expired',
+                'activities',
+                'register_rsvp', 
+                'register_profile'
+            ];
 
     for file in files:
         with open('static_content/' + file + '.html', 'w+', encoding='utf-8') as newFile:

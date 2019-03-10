@@ -1,4 +1,4 @@
-from page_config import get_public_pages, get_registration_pages
+from page_config import get_public_pages, get_registration_pages, get_page_config
 import json
 
 class View():
@@ -42,7 +42,10 @@ class View():
 
         return view_parts['common.html'].format(
             header=header,
-            view_content=view_parts[page_name + '.html'],
+            view_content= self.get_view_content(
+                view_parts,
+                page_name
+            ),
             footer=view_parts['footer.html'],
             common_js=view_parts['common.js'],
             top_nav=top_nav,
@@ -51,6 +54,83 @@ class View():
             page_content_signed=page_content_signed,
             user=user_attribites
         )
+
+    def get_view_content(self, view_parts, page_name):
+        view_html = view_parts[page_name + '.html']
+        if page_name in get_registration_pages():
+            register_form = self.get_register_form(page_name)
+            view_html = view_html.format(
+                register_form=register_form
+            )
+
+        return view_html
+
+    def get_register_form(self, page_name):
+        form_html = '<form class="w3-container w3-card-4 w3-sand">'
+        form_html += self.get_progress_bar(page_name)
+        page_config = get_page_config(page_name)
+        for row in page_config['layout']:
+            form_html += '<div class="w3-row row">'
+            for field in row:
+                form_html += self.field_factory(field, page_config['fields'][field])
+            form_html += '</div>'
+        form_html += '<p><button type="button" id="submit" class="w3-btn w3-padding w3-dark-grey" style="width:120px">Submit &nbsp; ❯</button></p>'
+        form_html += '</form>'
+        return form_html
+
+    def get_progress_bar(self, page_name):
+        if page_name == 'register_rsvp':
+            percent = '0'
+        elif page_name == 'register_profile':
+            percent = '25'
+        elif page_name == 'register_activities':
+            percent = '50'
+        elif page_name == 'register_hotel':
+            percent = '75'
+        elif page_name == 'register_complete':
+            percent = '100'
+        progress_bar = '<div class="w3-round progress-bar">'
+        progress_bar += '<div class="w3-container w3-round w3-deep-orange" style="width:{percent}%">{percent}%</div>'
+        progress_bar += '</div>'
+        return progress_bar.format(percent=percent)
+
+    def field_factory(self, field_name, field_meta):
+        if field_meta['type'] == 'boolean':
+            return self.get_boolean_field(field_name, field_meta)
+        elif field_meta['type'] == 'varchar':
+            return self.get_varchar_field(field_name, field_meta)
+        elif field_meta['type'] == 'email':
+            return self.get_varchar_field(field_name, field_meta)
+        else:
+            return ''
+
+    def get_boolean_field(self, field_name, field_meta):
+        values = ['Yes', 'No']
+        field_class = self.get_field_class(field_meta, 'radio')
+        type = 'radio'
+        field_html = ''
+        label = '<label class="w3-text-grey">{label_value}</label><br>'
+        field_html += label.format(label_value=field_meta['label'])
+        for value in values:
+            field_html += '<input name="{name}" class="{field_class}" type="{type}"> <label class="w3-text-grey">{value}</label> '
+            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=value)
+        return field_html
+
+    def get_varchar_field(self, field_name, field_meta):
+        field_class = self.get_field_class(field_meta, 'input')
+        type = 'input'
+        field_html = ''
+        label = '<label class="w3-text-grey">{label_value}</label><br>'
+        field_html += label.format(label_value=field_meta['label'])
+        field_html += '<input name="{name}" class="{field_class}" type="{type}">'
+        field_html = field_html.format(name=field_name, field_class=field_class, type=type)
+        return field_html
+
+    def get_field_class(self, field_meta, type):
+        field_class = 'w3-border w3-' + type
+        if field_meta['required'] == True:
+            field_class += ' w3-leftbar'
+        return field_class
 
     def get_view_parts(self, page_name):
         view_parts = {}

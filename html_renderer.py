@@ -1,5 +1,6 @@
 from page_config import get_public_pages, get_registration_pages, get_page_config
 import json
+import re
 
 class View():
     def make(self, page_name, user=None):
@@ -101,6 +102,12 @@ class View():
             return self.get_varchar_field(field_name, field_meta)
         elif field_meta['type'] == 'email':
             return self.get_varchar_field(field_name, field_meta)
+        elif field_meta['type'] == 'radio':
+            return self.get_radio_field(field_name, field_meta)
+        elif field_meta['type'] == 'dropdown':
+            return self.get_dropdown_field(field_name, field_meta)
+        elif field_meta['type'] == 'html':
+            return self.get_html_field(field_name, field_meta)
         else:
             return ''
 
@@ -112,8 +119,8 @@ class View():
         label = '<label class="w3-text-grey">{label_value}</label><br>'
         field_html += label.format(label_value=field_meta['label'])
         for value in values:
-            field_html += '<input name="{name}" class="{field_class}" type="{type}"> <label class="w3-text-grey">{value}</label> '
-            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=value)
+            field_html += '<input name="{name}" class="{field_class}" type="{type}" value="{value}"> <label class="w3-text-grey">{label}</label> '
+            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=self.snake_case(value), label=value)
         return field_html
 
     def get_varchar_field(self, field_name, field_meta):
@@ -125,6 +132,30 @@ class View():
         field_html += '<input name="{name}" class="{field_class}" type="{type}">'
         field_html = field_html.format(name=field_name, field_class=field_class, type=type)
         return field_html
+
+    def get_radio_field(self, field_name, field_meta):
+        field_class = self.get_field_class(field_meta, 'radio')
+        type = 'radio'
+        field_html = ''
+        label = '<label class="w3-text-grey">{label_value}</label><br>'
+        field_html += label.format(label_value=field_meta['label'])
+        for value in field_meta['values']:
+            field_html += '<input name="{name}" class="{field_class}" type="{type}" value="{value}"> <label class="w3-text-grey">{label}</label><br> '
+            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=self.snake_case(value), label=value)
+        return field_html
+
+    def get_dropdown_field(self, field_name, field_meta):
+        type = 'select'
+        field_html = ''
+        field_html += '<select class="w3-select w3-text-grey" name="{label_value}">'.format(label_value=field_meta['label'])
+        for value in field_meta['values']:
+            field_html += '<option class="w3-text-grey" value="{value}">{label}</option>'
+            field_html = field_html.format(value=self.snake_case(value), label=value)
+        field_html += '</select>'
+        return field_html
+
+    def get_html_field(self, field_name, field_meta):
+        return field_meta['html']
 
     def get_field_class(self, field_meta, type):
         field_class = 'w3-border w3-' + type
@@ -156,3 +187,7 @@ class View():
         if link == 'active_register' and page_name in get_registration_pages():
             return 'active'
         return ''
+
+    def snake_case(self, string):
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string.replace(" ", ""))
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()

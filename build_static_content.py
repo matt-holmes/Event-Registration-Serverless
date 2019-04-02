@@ -9,7 +9,10 @@ def build_static_content():
         'session_expired',
         'activities',
         'register_rsvp',
-        'register_profile'
+        'register_profile',
+        'register_activities',
+        'register_hotel',
+        'register_complete'
     ];
 
     for file in files:

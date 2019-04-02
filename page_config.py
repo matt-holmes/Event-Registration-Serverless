@@ -6,8 +6,7 @@ def get_registration_pages():
         'register_rsvp',
         'register_activities',
         'register_profile',
-        'register_hotel',
-        'register_complete'
+        'register_hotel'
     ]
 
 def get_page_config(page_name):
@@ -92,6 +91,57 @@ def get_page_config(page_name):
             'layout' : [
                 ['first_name', 'middle_name', 'last_name'],
                 ['email']
+            ]
+        },
+        'register_activities' : {
+            'fields' : {
+                'morning_activity' : {
+                    'required' : True,
+                    'label' : 'Morning Activity',
+                    'type' : 'radio',
+                    'values' : ['5K Run', 'Golf', 'Tennis']
+                },
+                'afternoon_activity' : {
+                    'required' : True,
+                    'label' : 'Afternoon Activity',
+                    'type' : 'radio',
+                    'values' : ['Gambling', 'See A Show'],
+                },
+                'evening_activity' : {
+                    'required' : True,
+                    'label' : 'Evening Activity',
+                    'type' : 'radio',
+                    'values' : ['Bar Crawl', 'Gambling', 'See A Show'],
+                },
+            },
+            'layout' : [
+                ['morning_activity'],
+                ['afternoon_activity'],
+                ['evening_activity']
+            ]
+        },
+        'register_hotel' : {
+            'fields' : {
+                'hotel' : {
+                    'required' : True,
+                    'label' : '',
+                    'type' : 'radio',
+                    'values' : ['MGM', 'Aries', 'Bellagio']
+                },
+                'bed' : {
+                    'required' : True,
+                    'label' : 'Bed',
+                    'type' : 'dropdown',
+                    'values' : ['', 'King', 'Doubles']
+                },
+                'dates_html' : {
+                    'type' : 'html',
+                    'html' : 'Your checkin date will be 01/01/2019 and check out will be on 01/05/2019'
+                }
+            },
+            'layout' : [
+                ['dates_html', 'hotel'],
+                ['bed']
             ]
         },
     }

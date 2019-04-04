@@ -206,7 +206,6 @@ def save_registration_step(event, page_name):
     user.save()
     return {'redirect' : user.get_current_step()}
 
-
 def update_user_step_status(page_name, user):
     if page_name == 'register_rsvp_handler':
         user.set('rsvp_step_status', 'complete')
@@ -216,3 +215,5 @@ def update_user_step_status(page_name, user):
         user.set('activities_step_status', 'complete')
     elif page_name == 'register_hotel_handler':
         user.set('hotel_step_status', 'complete')
+
+    return user

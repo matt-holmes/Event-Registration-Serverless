@@ -5,9 +5,9 @@ import re
 class View():
     def make(self, page_name, user=None):
         if(user):
-            user_attribites = user.get_attributes()
+            self.user_attributes = user.get_attributes()
         else:
-            user_attribites = {}
+            self.user_attributes = {}
 
         js_options = self.get_js_options(page_name, user)
         view_parts = self.get_view_parts(page_name)
@@ -24,7 +24,7 @@ class View():
                     active_activities = self.is_active('active_activities', page_name),
                     active_register = self.is_active('active_register', page_name)
                 ),
-                user=user_attribites
+                user=user_attributes
             )
 
             side_nav = view_parts['side_nav.html'].format(
@@ -53,7 +53,7 @@ class View():
             side_nav=side_nav,
             js_options=js_options,
             page_content_signed=page_content_signed,
-            user=user_attribites
+            user=user_attributes
         )
 
     def get_view_content(self, view_parts, page_name):
@@ -80,16 +80,18 @@ class View():
         return form_html
 
     def get_progress_bar(self, page_name):
-        if page_name == 'register_rsvp':
-            percent = '0'
-        elif page_name == 'register_profile':
-            percent = '25'
-        elif page_name == 'register_activities':
-            percent = '50'
-        elif page_name == 'register_hotel':
-            percent = '75'
-        elif page_name == 'register_complete':
+        if self.user_attributes['status'] == 'complete':
             percent = '100'
+        else:
+            if page_name == 'register_rsvp':
+                percent = '0'
+            elif page_name == 'register_profile':
+                percent = '25'
+            elif page_name == 'register_activities':
+                percent = '50'
+            elif page_name == 'register_hotel':
+                percent = '75'
+
         progress_bar = '<div class="w3-round progress-bar">'
         progress_bar += '<div class="w3-container w3-round w3-deep-orange" style="width:{percent}%">{percent}%</div>'
         progress_bar += '</div>'

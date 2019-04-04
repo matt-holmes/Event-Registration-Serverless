@@ -3,7 +3,7 @@ import hashlib
 import uuid
 from models import User
 from html_renderer import View
-from page_config import get_public_pages, get_page_config
+from page_config import get_public_pages, get_page_config, get_registration_pages
 import re
 
 def is_signed_in(func):
@@ -30,10 +30,12 @@ def handle_request(page_name, event):
         validate_form_result = validate_form(page_name, event['body'])
         if validate_form_result != True:
             return validate_form_result
-        if page_name == 'sign_up':
+        elif page_name == 'sign_up':
             return create_user(event['body'])
-        if page_name == 'sign_in':
+        elif page_name == 'sign_in':
             return authenticate_user(event['body'])
+        elif page_name in get_registration_pages():
+            return save_registration_step(event, page_name)
 
         return event
 
@@ -195,3 +197,22 @@ def get_validation_error_response(field, message, response=None):
         }
 
     return response
+
+def save_registration_step(event, page_name):
+    user = get_user_from_token(event['headers'])
+    user = update_user_step_status(page_name, user)
+    for name, value in event['body'].items():
+        user.set(name, value)
+    user.save()
+    return {'redirect' : user.get_current_step()}
+
+
+def update_user_step_status(page_name, user):
+    if page_name == 'register_rsvp_handler':
+        user.set('rsvp_step_status', 'complete')
+    elif page_name == 'register_profile_handler':
+        user.set('profile_step_status', 'complete')
+    elif page_name == 'register_activities_handler':
+        user.set('activities_step_status', 'complete')
+    elif page_name == 'register_hotel_handler':
+        user.set('hotel_step_status', 'complete')

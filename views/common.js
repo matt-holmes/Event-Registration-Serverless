@@ -26,11 +26,14 @@ function app() {
     const form = document.querySelector('form');
     let data = Object.values(form).reduce(
       (obj,field) => {
-        obj[field.name] = field.value;
+          if (field.name != '' && ((field.type !== 'checkbox' && field.type !== 'radio') || field.checked)) {
+              obj[field.name] = field.value;
+          }
         return obj
       },
       {}
     );
+    console.log(data);
     submitInputs(data)
   }
 
@@ -96,6 +99,9 @@ function app() {
 
     for (let i = 0, error; error = errors[i++];) {
       let field = document.querySelector('input[name="' + error.field + '"]');
+      if(field == null) {
+          field = document.querySelector('select[name="' + error.field + '"]');
+      }
       field.classList.add('w3-border-red');
       var newEl = document.createElement('h4');
       newEl.className = 'w3-center w3-text-white';

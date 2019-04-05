@@ -24,7 +24,7 @@ class View():
                     active_activities = self.is_active('active_activities', page_name),
                     active_register = self.is_active('active_register', page_name)
                 ),
-                user=user_attributes
+                user=self.user_attributes
             )
 
             side_nav = view_parts['side_nav.html'].format(
@@ -53,7 +53,7 @@ class View():
             side_nav=side_nav,
             js_options=js_options,
             page_content_signed=page_content_signed,
-            user=user_attributes
+            user=self.user_attributes
         )
 
     def get_view_content(self, view_parts, page_name):
@@ -149,7 +149,7 @@ class View():
     def get_dropdown_field(self, field_name, field_meta):
         type = 'select'
         field_html = ''
-        field_html += '<select class="w3-select w3-text-grey" name="{label_value}">'.format(label_value=field_meta['label'])
+        field_html += '<select class="w3-select w3-text-grey" name="{name}">'.format(name=field_name, label_value=field_meta['label'])
         for value in field_meta['values']:
             field_html += '<option class="w3-text-grey" value="{value}">{label}</option>'
             field_html = field_html.format(value=self.snake_case(value), label=value)

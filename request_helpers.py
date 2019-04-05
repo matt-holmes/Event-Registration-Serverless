@@ -203,6 +203,8 @@ def save_registration_step(event, page_name):
     user = update_user_step_status(page_name, user)
     for name, value in event['body'].items():
         user.set(name, value)
+    if page_name == 'register_hotel':
+        user.set('status', 'complete')
     user.save()
     return {'redirect' : user.get_current_step()}
 

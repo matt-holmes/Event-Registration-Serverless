@@ -4,6 +4,21 @@ import re
 
 class View():
     def make(self, page_name, user=None):
+        """
+        Builds and returns the html/javascript/css for a given page.
+        Parameters
+        ----------
+        arg1 : page_name
+            Name of page being rendered
+        arg2 : user
+            User object if the user is signed in
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         if(user):
             self.user_attributes = user.get_attributes()
         else:
@@ -57,6 +72,21 @@ class View():
         )
 
     def get_view_content(self, view_parts, page_name):
+        """
+        Returns html from the views/ html directory.  If its a registration page,
+        it will add the registration specific content
+        ----------
+        arg1 : view_parts
+            Dictionary of cached view html strings
+        arg2 : page_name
+            Name of page being rendered
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         view_html = view_parts[page_name + '.html']
         if page_name in get_registration_pages():
             register_form = self.get_register_form(page_name)
@@ -67,6 +97,18 @@ class View():
         return view_html
 
     def get_register_form(self, page_name):
+        """
+        Builds and returns the form and form fields html.
+        ----------
+        arg1 : page_name
+            Name of page being rendered
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         form_html = '<form class="w3-container w3-card-4 w3-sand">'
         form_html += self.get_progress_bar(page_name)
         page_config = get_page_config(page_name)
@@ -80,6 +122,18 @@ class View():
         return form_html
 
     def get_progress_bar(self, page_name):
+        """
+        Builds and returns the progress bar html.
+        ----------
+        arg1 : page_name
+            Name of page being rendered
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         if self.user_attributes['status'] == 'complete':
             percent = '100'
         else:
@@ -98,6 +152,21 @@ class View():
         return progress_bar.format(percent=percent)
 
     def field_factory(self, field_name, field_meta):
+        """
+        Factory pattern for building and returning specific form field html
+        ----------
+        arg1 : field_name
+            Name of field being rendered
+
+        arg2 : field_meta
+            Field specific meta data
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         if field_meta['type'] == 'boolean':
             return self.get_boolean_field(field_name, field_meta)
         elif field_meta['type'] == 'varchar':
@@ -114,6 +183,21 @@ class View():
             return ''
 
     def get_boolean_field(self, field_name, field_meta):
+        """
+        Builds and returns the html for a yes/no radio button
+        ----------
+        arg1 : field_name
+            Name of field being rendered
+
+        arg2 : field_meta
+            Field specific meta data
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         values = ['Yes', 'No']
         field_class = self.get_field_class(field_meta, 'radio')
         type = 'radio'
@@ -121,45 +205,137 @@ class View():
         label = '<label class="w3-text-grey">{label_value}</label><br>'
         field_html += label.format(label_value=field_meta['label'])
         for value in values:
-            field_html += '<input name="{name}" class="{field_class}" type="{type}" value="{value}"> <label class="w3-text-grey">{label}</label> '
-            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=self.snake_case(value), label=value)
+            if field_name in self.user_attributes and self.user_attributes[field_name] == self.snake_case(value):
+                checked = 'checked'
+            else:
+                checked = ''
+            field_html += '<input name="{name}" class="{field_class}" type="{type}" value="{value}" {checked}> <label class="w3-text-grey">{label}</label> '
+            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=self.snake_case(value), label=value, checked=checked)
         return field_html
 
     def get_varchar_field(self, field_name, field_meta):
+        """
+        Builds and returns the html for an input box
+        ----------
+        arg1 : field_name
+            Name of field being rendered
+
+        arg2 : field_meta
+            Field specific meta data
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         field_class = self.get_field_class(field_meta, 'input')
         type = 'input'
         field_html = ''
         label = '<label class="w3-text-grey">{label_value}</label><br>'
+        if field_name in self.user_attributes:
+            saved_value = self.user_attributes[field_name]
+        else:
+            saved_value = ''
         field_html += label.format(label_value=field_meta['label'])
-        field_html += '<input name="{name}" class="{field_class}" type="{type}">'
-        field_html = field_html.format(name=field_name, field_class=field_class, type=type)
+        field_html += '<input name="{name}" class="{field_class}" type="{type}" value="{saved_value}">'
+        field_html = field_html.format(name=field_name, field_class=field_class, type=type, saved_value=saved_value)
         return field_html
 
     def get_radio_field(self, field_name, field_meta):
+        """
+        Builds and returns the html for a list of radio buttons
+        ----------
+        arg1 : field_name
+            Name of field being rendered
+
+        arg2 : field_meta
+            Field specific meta data
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         field_class = self.get_field_class(field_meta, 'radio')
         type = 'radio'
         field_html = ''
         label = '<label class="w3-text-grey">{label_value}</label><br>'
         field_html += label.format(label_value=field_meta['label'])
         for value in field_meta['values']:
-            field_html += '<input name="{name}" class="{field_class}" type="{type}" value="{value}"> <label class="w3-text-grey">{label}</label><br> '
-            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=self.snake_case(value), label=value)
+            if field_name in self.user_attributes and self.user_attributes[field_name] == self.snake_case(value):
+                checked = 'checked'
+            else:
+                checked = ''
+            field_html += '<input name="{name}" class="{field_class}" type="{type}" value="{value}" {checked}> <label class="w3-text-grey">{label}</label><br> '
+            field_html = field_html.format(name=field_name, field_class=field_class, type=type, value=self.snake_case(value), label=value, checked=checked)
         return field_html
 
     def get_dropdown_field(self, field_name, field_meta):
+        """
+        Builds and returns the html for a dropdown field
+        ----------
+        arg1 : field_name
+            Name of field being rendered
+
+        arg2 : field_meta
+            Field specific meta data
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         type = 'select'
+
         field_html = ''
         field_html += '<select class="w3-select w3-text-grey" name="{name}">'.format(name=field_name, label_value=field_meta['label'])
         for value in field_meta['values']:
-            field_html += '<option class="w3-text-grey" value="{value}">{label}</option>'
-            field_html = field_html.format(value=self.snake_case(value), label=value)
+            if field_name in self.user_attributes and self.user_attributes[field_name] == self.snake_case(value):
+                selected ='selected'
+            else:
+                selected = ''
+            field_html += '<option class="w3-text-grey" value="{value}" {selected}>{label}</option>'
+            field_html = field_html.format(value=self.snake_case(value), label=value, selected=selected)
         field_html += '</select>'
         return field_html
 
     def get_html_field(self, field_name, field_meta):
+        """
+        Builds and returns the html a configured block of html (text between fields)
+        ----------
+        arg1 : field_name
+            Name of field being rendered
+
+        arg2 : field_meta
+            Field specific meta data
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         return field_meta['html']
 
     def get_field_class(self, field_meta, type):
+        """
+        Builds and returns css classes for specific fields
+        ----------
+        arg1 : field_meta
+            Field specific meta data
+
+        arg2 : type
+            the field type
+
+        Returns
+        -------
+        string
+            html/javascript/css
+
+        """
         field_class = 'w3-border w3-' + type
         if field_meta['required'] == True:
             field_class += ' w3-leftbar'
@@ -178,10 +354,40 @@ class View():
         return view_parts
 
     def get_js_options(self, page_name, user):
+        """
+        Inserts serverside javascript variables
+        ----------
+        arg1 : field_meta
+            Field specific meta data
+
+        arg2 : user
+            The user attributes or empty dict
+
+        Returns
+        -------
+        string
+            json string
+
+        """
         js_options = {'page_name':page_name}
         return json.dumps(js_options, ensure_ascii=False)
 
     def is_active(self, link, page_name):
+        """
+        The active link for the side navigation menu
+        ----------
+        arg1 : link
+            Field specific meta data
+
+        arg2 : page_name
+            Name of page being rendered
+
+        Returns
+        -------
+        string
+            Returns the word active or empty string
+
+        """
         if link == 'active_home' and page_name == 'home':
             return 'active'
         if link == 'active_activities' and page_name == 'activities':
@@ -191,5 +397,17 @@ class View():
         return ''
 
     def snake_case(self, string):
+        """
+        Formats radio/dropdown save values into snake_case
+        ----------
+        arg1 : string
+            String being formatted
+
+        Returns
+        -------
+        string
+            Returns formatted string
+
+        """
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string.replace(" ", ""))
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()

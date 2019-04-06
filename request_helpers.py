@@ -7,6 +7,18 @@ from page_config import get_public_pages, get_page_config, get_registration_page
 import re
 
 def is_signed_in(func):
+    """
+    Decorator pattern to check if the user is signed in
+    ----------
+    arg1 : func
+        function to be executed if the user is signed in
+
+    Returns
+    -------
+    Function
+        the inner function
+
+    """
     def wrapper(page_name, event):
         user = get_user_from_token(event['headers'])
         event['user'] = user
@@ -22,6 +34,20 @@ def is_signed_in(func):
 
 @is_signed_in
 def handle_request(page_name, event):
+    """
+    Checks the request type and handles the response
+    ----------
+    arg1 : page_name
+        Page name from the request
+
+    arg1 : event
+        Request data
+    Returns
+    -------
+    Mixed
+        HTML for Get requests, JSON for posts
+
+    """
     action = event['method']
     if action == 'GET':
         view = View()
@@ -40,6 +66,18 @@ def handle_request(page_name, event):
         return event
 
 def get_user_from_token(headers):
+    """
+    Pulls up the token from a page request cookie to check if the user has a valid session
+    ----------
+    arg1 : headers
+        request headers
+
+    Returns
+    -------
+    Mixed
+        False for invalid cookie, User object for a good session, None for a catch all
+
+    """
     if 'Cookie' not in headers:
         return False
     cookie_parts = headers['Cookie'].split('=')
@@ -56,6 +94,18 @@ def get_user_from_token(headers):
 
 
 def create_user(inputs):
+    """
+    Validates and creates a new user
+    ----------
+    arg1 : inputs
+        inputs from the sign up page
+
+    Returns
+    -------
+    String
+        JSON either validation errors or a cookie and redirect for a success submission
+
+    """
     user = User()
     user_exists = user.find(inputs['username'], True)
     if user_exists != False:
@@ -70,6 +120,18 @@ def create_user(inputs):
     }
 
 def get_new_user_data(inputs):
+    """
+    Populates and returns a dict of new user data
+    ----------
+    arg1 : inputs
+        inputs from the sign up page
+
+    Returns
+    -------
+    Dictionary
+        The user data
+
+    """
     id = str(uuid.uuid4())
     return {
         'id' : id,
@@ -87,6 +149,21 @@ def get_new_user_data(inputs):
     }
 
 def get_hashed_password(password, for_password = False):
+    """
+    Hashes a password for the session and password attribute in the db
+    ----------
+    arg1 : password
+        password to be hashed
+
+    arg2 : for_password
+        lets me know if its for the session or the password attr
+
+    Returns
+    -------
+    String
+        Hashed password
+
+    """
     salt = uuid.uuid4().hex
     salted_input = salt.encode() + password.encode()
     if for_password:
@@ -95,6 +172,18 @@ def get_hashed_password(password, for_password = False):
         return hashlib.sha256(salted_input).hexdigest()
 
 def authenticate_user(inputs):
+    """
+    Autheticates user for the sign-in page
+    ----------
+    arg1 : inputs
+        Inputs from request
+
+    Returns
+    -------
+    String
+        JSON either validation errors or a cookie and redirect for a success submission
+
+    """
     user = User()
     user.find(inputs['username'], True)
     if(user.get('id') == None):
@@ -115,6 +204,21 @@ def authenticate_user(inputs):
             return get_validation_error_response('password', "Incorrect Password.")
 
 def validate_form(page_name, inputs):
+    """
+    Validates a form.
+    ----------
+    arg1 : page_name
+        Page name
+
+    arg2 : inputs
+        Inputs from request
+
+    Returns
+    -------
+    Mixed
+        JSON validation errors or True for a success submission
+
+    """
     page_config = get_page_config(page_name)
     is_valid = True
     response =  {
@@ -144,6 +248,30 @@ def validate_form(page_name, inputs):
     return is_valid
 
 def get_required_validation_response(is_valid, field, inputs, meta, response):
+    """
+    Validates a required field.
+    ----------
+    arg1 : is_valid
+        Boolean to track the form status
+
+    arg2 : field
+        Name of field being validated
+
+    arg3 : inputs
+        Inputs from request
+
+    arg4 : meta
+        Field meta data
+
+    arg5 : response
+        JSON response
+
+    Returns
+    -------
+    String
+        JSON of the validation result
+
+    """
     if field not in inputs or inputs[field] == '':
         is_valid = False
         label = meta['label']
@@ -155,6 +283,33 @@ def get_required_validation_response(is_valid, field, inputs, meta, response):
     }
 
 def get_equals_validation_response(is_valid, field, inputs, meta, response, page_config):
+    """
+    Validates that 2 field values are the same (re-enter password).
+    ----------
+    arg1 : is_valid
+        Boolean to track the form status
+
+    arg2 : field
+        Name of field being validated
+
+    arg3 : inputs
+        Inputs from request
+
+    arg4 : meta
+        Field meta data
+
+    arg5 : response
+        JSON response
+
+    arg6 : page_config
+        Page config
+
+    Returns
+    -------
+    String
+        JSON of the validation result
+
+    """
     if (field not in inputs or meta['equals'] not in inputs) or inputs[field] != inputs[meta['equals']]:
         is_valid = False
         label = meta['label']
@@ -168,6 +323,30 @@ def get_equals_validation_response(is_valid, field, inputs, meta, response, page
     }
 
 def get_type_validation_response(is_valid, field, inputs, meta, response):
+    """
+    Validates field type specific (email, phone, etc)
+    ----------
+    arg1 : is_valid
+        Boolean to track the form status
+
+    arg2 : field
+        Name of field being validated
+
+    arg3 : inputs
+        Inputs from request
+
+    arg4 : meta
+        Field meta data
+
+    arg5 : response
+        JSON response
+
+    Returns
+    -------
+    String
+        JSON of the validation result
+
+    """
     email_pattern = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
     if meta['type'] == 'email' and re.match(email_pattern, inputs['email']) == None:
         is_valid = False
@@ -181,6 +360,24 @@ def get_type_validation_response(is_valid, field, inputs, meta, response):
     }
 
 def get_validation_error_response(field, message, response=None):
+    """
+    Builds a response of the validation result
+    ----------
+    arg1 : field
+        Name of field being validated
+
+    arg2 : message
+        Text to displayed to the user
+
+    arg3 : response
+        JSON response
+
+    Returns
+    -------
+    String
+        JSON of the validation result
+
+    """
     error = {
         'field' : field,
         'message' : message
@@ -199,16 +396,44 @@ def get_validation_error_response(field, message, response=None):
     return response
 
 def save_registration_step(event, page_name):
+    """
+    Updates user on registration page submissions
+    ----------
+    arg1 : event
+        request object
+
+    arg2 : page_name
+        Page name
+
+    Returns
+    -------
+    String
+        JSON of the redirect to next step
+
+    """
     user = get_user_from_token(event['headers'])
     user = update_user_step_status(page_name, user)
     for name, value in event['body'].items():
         user.set(name, value)
-    if page_name == 'register_hotel':
-        user.set('status', 'complete')
+
     user.save()
     return {'redirect' : user.get_current_step()}
 
 def update_user_step_status(page_name, user):
+    """
+    Updates step status attributes for the page being saved
+    ----------
+    arg1 : page_name
+        Page name
+
+    arg2 : user
+        User object
+
+    Returns
+    -------
+    Object
+        User object to be saved
+    """
     if page_name == 'register_rsvp':
         user.set('rsvp_step_status', 'complete')
     elif page_name == 'register_profile':
@@ -217,5 +442,6 @@ def update_user_step_status(page_name, user):
         user.set('activities_step_status', 'complete')
     elif page_name == 'register_hotel':
         user.set('hotel_step_status', 'complete')
+        user.set('status', 'complete')
 
     return user

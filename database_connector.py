@@ -1,4 +1,16 @@
 def get_table_connection(table_name):
+    """
+    Returns a database connection for a given table
+    ----------
+    arg1 : table_name
+        Table name for the connection
+
+    Returns
+    -------
+    boto3 object
+        a connection for the given table
+
+    """
     try:
         boto3
     except NameError:

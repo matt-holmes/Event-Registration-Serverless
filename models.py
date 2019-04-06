@@ -22,6 +22,7 @@ class AbstractModel(metaclass=ABCMeta):
 
 
 class Model(AbstractModel):
+    ''' Acts as a mini ORM for getting model properties and saving to a database'''
     attributes = {}
 
     table_name = ''
@@ -54,6 +55,21 @@ class Model(AbstractModel):
         self.attributes[attribute] = value
 
     def find(self, key = False, gsi = False):
+        """
+        Performs a looks of a primary key (hash) or GSI (username) and sets the
+        database attributes into the model object
+        ----------
+        arg1 : key
+            hash for the item
+        arg2 : gsi
+            global secondary Index
+
+        Returns
+        -------
+        mixed
+            Only makes a boolean return when something goes wrong
+
+        """
         try:
             ClientError
         except NameError:
@@ -83,6 +99,14 @@ class Model(AbstractModel):
             self.set_attributes({})
 
     def save(self):
+        """
+        Saves to the database
+
+        Returns
+        -------
+        None
+
+        """
         get_table_connection(self.table_name).put_item(Item=self.get_attributes())
 
 
@@ -97,10 +121,29 @@ class User(Model):
     global_secondary_name = 'userName'
 
     def check_password(self, request_password):
+        """
+        validates password against the database
+        ----------
+        arg1 : request_password
+            password passed in on the request
+
+        Returns
+        -------
+        boolean
+            Returns the result of the password check
+        """
         password, salt = self.get('password').split(':')
         return password == hashlib.sha256(salt.encode() + request_password.encode()).hexdigest()
 
     def get_current_step(self):
+        """
+        Pulls up the current registation step
+
+        Returns
+        -------
+        String
+            Returns link of to the current registation step
+        """
         if self.get('rsvp_step_status') == None:
             return 'register-rsvp'
         elif self.get('profile_step_status') == None:

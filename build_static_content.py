@@ -2,6 +2,15 @@ from html_renderer import View
 from models import User
 
 def build_static_content():
+    """
+    Builds a set of html files to make testing changes easier.  Otherwise I would
+    need to deploy everytime I want to test a small html update
+
+    Returns
+    -------
+    None
+
+    """
     files = [
         'sign_in',
         'home',

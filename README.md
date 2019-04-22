@@ -11,4 +11,4 @@
 * Expand automated test coverage
 * Return proper HTTP codes for all the use-cases
 * Tighten access controls
-* Invalid session on sign out
+* Invalidate session on sign out
